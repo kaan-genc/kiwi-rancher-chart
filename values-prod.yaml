@@ -22,9 +22,9 @@ service:
     https: 8443
 
 storage:
+  class: longhorn
   persistent: true
-  class: standard
-  size: 20Gi
+  size: 32Gi
 
 media:
   root: /Kiwi/uploads
