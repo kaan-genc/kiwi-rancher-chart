@@ -1,4 +1,4 @@
-{{- $secret_name := include "kiwi.credentials" . -}}
+{{- $secret_name := .Values.database.existingSecret | default (include "kiwi.credentials" .) -}}
 
 apiVersion: apps/v1
 kind: StatefulSet
@@ -27,7 +27,7 @@ spec:
           {{- if .Values.storage.persistent }}
           persistentVolumeClaim:
             claimName: {{ include "kiwi.fullname" . }}
-          {{- else -}}
+          {{- else }}
           emptyDir: {}
           {{- end }}
 
@@ -37,27 +37,27 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/Kiwi/manage.py", "migrate"]
           env:
-          - name: SECRET_KEY
-            valueFrom:
-              secretKeyRef:
-                name: {{ $secret_name }}
-                key: secret_key
-          - name: KIWI_DB_USER
-            valueFrom:
-              secretKeyRef:
-                name: {{ $secret_name }}
-                key: mariadb-username
-          - name: KIWI_DB_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: {{ $secret_name }}
-                key: mariadb-password
-          - name: KIWI_DB_HOST
-            value: {{ .Values.database.host }}
-          - name: KIWI_DB_PORT
-            value: {{ .Values.database.port | quote }}
-          - name: KIWI_DB_NAME
-            value: {{ .Values.database.db_name }}
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $secret_name }}
+                  key: secret_key
+            - name: KIWI_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $secret_name }}
+                  key: POSTGRES_USER
+            - name: KIWI_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $secret_name }}
+                  key: POSTGRES_PASSWORD
+            - name: KIWI_DB_HOST
+              value: {{ .Values.database.host | quote }}
+            - name: KIWI_DB_PORT
+              value: {{ .Values.database.port | quote }}
+            - name: KIWI_DB_NAME
+              value: {{ .Values.database.db_name | quote }}
 
       containers:
         - name: {{ .Chart.Name }}
@@ -81,36 +81,36 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
-          - name: SECRET_KEY
-            valueFrom:
-              secretKeyRef:
-                name: {{ $secret_name }}
-                key: secret_key
-          - name: KIWI_DB_USER
-            valueFrom:
-              secretKeyRef:
-                name: {{ $secret_name }}
-                key: mariadb-username
-          - name: KIWI_DB_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: {{ $secret_name }}
-                key: mariadb-password
-          - name: KIWI_DB_HOST
-            value: {{ .Values.database.host }}
-          - name: KIWI_DB_PORT
-            value: {{ .Values.database.port | quote }}
-          - name: KIWI_DB_NAME
-            value: {{ .Values.database.db_name }}
-          - name: SERVER_EMAIL
-            value: {{ .Values.email.from }}
-          - name: EMAIL_SUBJECT_PREFIX
-            value: {{ .Values.email.subject | quote }}
-          - name: MEDIA_ROOT
-            value: {{ .Values.media.root }}
-          - name: MEDIA_URL
-            value: {{ .Values.media.url }}
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $secret_name }}
+                  key: secret_key
+            - name: KIWI_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $secret_name }}
+                  key: POSTGRES_USER
+            - name: KIWI_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $secret_name }}
+                  key: POSTGRES_PASSWORD
+            - name: KIWI_DB_HOST
+              value: {{ .Values.database.host | quote }}
+            - name: KIWI_DB_PORT
+              value: {{ .Values.database.port | quote }}
+            - name: KIWI_DB_NAME
+              value: {{ .Values.database.db_name | quote }}
+            - name: SERVER_EMAIL
+              value: {{ .Values.email.from | quote }}
+            - name: EMAIL_SUBJECT_PREFIX
+              value: {{ .Values.email.subject | quote }}
+            - name: MEDIA_ROOT
+              value: {{ .Values.media.root | quote }}
+            - name: MEDIA_URL
+              value: {{ .Values.media.url | quote }}
 
           volumeMounts:
-          - name: media
-            mountPath: {{ .Values.media.root }}
+            - name: media
+              mountPath: {{ .Values.media.root | quote }}
