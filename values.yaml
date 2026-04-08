@@ -6,7 +6,7 @@ image:
 service:
   type: ClusterIP
   port:
-    http: 8080
+    http: 80
     https: 8443
 
 ingress:
