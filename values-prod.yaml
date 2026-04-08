@@ -1,0 +1,40 @@
+image:
+  repository: pub.kiwitcms.eu/kiwitcms/kiwi
+  tag: latest
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/proxy-body-size: "20m"
+  host: kiwi.example.com
+  tls:
+    enabled: false
+
+service:
+  type: ClusterIP
+  port:
+    http: 8080
+    https: 8443
+
+storage:
+  persistent: true
+  class: standard
+  size: 20Gi
+
+media:
+  root: /Kiwi/uploads
+  url: /uploads/
+
+database:
+  type: postgres
+  internal: false
+  host: 10.190.205.6
+  port: 5432
+  db_name: kiwitcms
+  username: kiwi
+  passwordSecret: kiwi-secret
