@@ -1,5 +1,5 @@
 image:
-  repository: pub.kiwitcms.eu/kiwitcms/kiwi
+  repository: nexus.tani.com.tr/kiwi-postgres
   tag: latest
   pullPolicy: IfNotPresent
 
