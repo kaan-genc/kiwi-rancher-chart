@@ -1,0 +1,9 @@
+FROM pub.kiwitcms.eu/kiwitcms/kiwi:latest
+
+USER root
+
+RUN /venv/bin/pip install --no-cache-dir psycopg[binary]
+
+COPY postgres_settings.py /venv/lib64/python3.11/site-packages/tcms_settings_dir/postgres_settings.py
+
+USER 1001
