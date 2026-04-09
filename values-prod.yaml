@@ -1,5 +1,5 @@
 image:
-  repository: nexus.tani.com.tr/kiwi-postgres
+  repository: nexus.tani.com.tr/docker-local/kiwi-postgres
   tag: latest
   pullPolicy: IfNotPresent
 
