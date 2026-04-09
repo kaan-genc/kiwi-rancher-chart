@@ -1,5 +1,5 @@
 image:
-  repository: nexus.tani.com.tr/kiwi-postgres
+  repository: nexus.tani.com.tr/docker-local/kiwi-postgres
   pullPolicy: IfNotPresent
   tag: latest
 
@@ -7,7 +7,6 @@ service:
   type: ClusterIP
   port:
     http: 80
-    https: 8443
 
 ingress:
   enabled: false
@@ -35,10 +34,6 @@ storage:
 media:
   root: "/Kiwi/uploads"
   url: "/uploads/"
-
-email:
-  from: "kiwi@example.com"
-  subject: "[Kiwi-TCMS] "
 
 database:
   type: postgres
