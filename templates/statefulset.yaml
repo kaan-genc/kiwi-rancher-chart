@@ -61,6 +61,8 @@ spec:
               value: {{ .Values.database.port | quote }}
             - name: KIWI_DB_NAME
               value: {{ .Values.database.db_name | quote }}
+            - name: TCMS_SETTINGS_MODULE
+              value: tcms_settings_dir.postgres_settings
 
       containers:
         - name: {{ .Chart.Name }}
@@ -105,6 +107,8 @@ spec:
               value: {{ .Values.database.port | quote }}
             - name: KIWI_DB_NAME
               value: {{ .Values.database.db_name | quote }}
+            - name: TCMS_SETTINGS_MODULE
+              value: tcms_settings_dir.postgres_settings
             - name: SERVER_EMAIL
               value: {{ .Values.email.from | quote }}
             - name: EMAIL_SUBJECT_PREFIX
