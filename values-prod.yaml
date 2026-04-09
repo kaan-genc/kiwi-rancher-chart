@@ -19,7 +19,6 @@ service:
   type: ClusterIP
   port:
     http: 8080
-    https: 8443
 
 storage:
   class: longhorn-retain
