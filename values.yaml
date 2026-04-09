@@ -35,6 +35,10 @@ media:
   root: "/Kiwi/uploads"
   url: "/uploads/"
 
+email:
+  from: "kiwi@example.com"
+  subject: "[Kiwi-TCMS] "
+
 database:
   type: postgres
   host: 10.190.205.6
