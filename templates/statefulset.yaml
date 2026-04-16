@@ -23,7 +23,7 @@ spec:
         fsGroup: 1001
 
       imagePullSecrets:
-        - name: nexus-registry
+        - name: ghcr-secret
 
       volumes:
         - name: media
