@@ -1,5 +1,5 @@
 image:
-  repository: ghcr.io/kaan-genc/kiwi-postgres:latest
+  repository: ghcr.io/kaan-genc/kiwi-postgres
   tag: latest
   pullPolicy: IfNotPresent
 
