@@ -46,6 +46,9 @@ spec:
                   name: {{ $secret_name }}
                   key: secret_key
 
+            - name: KIWI_DB_ENGINE
+              value: django.db.backends.postgresql
+
             - name: KIWI_DB_USER
               valueFrom:
                 secretKeyRef:
@@ -66,12 +69,6 @@ spec:
 
             - name: KIWI_DB_NAME
               value: {{ .Values.database.db_name | quote }}
-
-            - name: TCMS_SETTINGS_MODULE
-              value: tcms_settings_dir.postgres_settings
-
-            - name: DJANGO_SETTINGS_MODULE
-              value: tcms_settings_dir.postgres_settings
 
       containers:
         - name: {{ .Chart.Name }}
@@ -107,6 +104,9 @@ spec:
                   name: {{ $secret_name }}
                   key: secret_key
 
+            - name: KIWI_DB_ENGINE
+              value: django.db.backends.postgresql
+
             - name: KIWI_DB_USER
               valueFrom:
                 secretKeyRef:
@@ -127,12 +127,6 @@ spec:
 
             - name: KIWI_DB_NAME
               value: {{ .Values.database.db_name | quote }}
-
-            - name: TCMS_SETTINGS_MODULE
-              value: tcms_settings_dir.postgres_settings
-
-            - name: DJANGO_SETTINGS_MODULE
-              value: tcms_settings_dir.postgres_settings
 
             - name: SERVER_EMAIL
               value: {{ .Values.email.from | quote }}
