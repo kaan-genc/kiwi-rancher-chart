@@ -12,8 +12,8 @@ ingress:
   enabled: false
   className: nginx
   annotations:
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-  host: kiwi.example.org
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+  host: kiwi.tani.com.tr
   tls:
     enabled: false
     port: 443
