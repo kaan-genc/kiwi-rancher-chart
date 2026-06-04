@@ -1,5 +1,5 @@
 image:
-  repository: ghcr.io/kaan-genc/kiwi-postgres
+  repository: kiwitcms/kiwi
   pullPolicy: IfNotPresent
 
 replicaCount: 1
