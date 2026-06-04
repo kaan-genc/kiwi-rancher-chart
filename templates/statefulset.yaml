@@ -45,76 +45,104 @@ spec:
                 secretKeyRef:
                   name: {{ $secret_name }}
                   key: secret_key
+
             - name: KIWI_DB_USER
               valueFrom:
                 secretKeyRef:
                   name: {{ $secret_name }}
                   key: POSTGRES_USER
+
             - name: KIWI_DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ $secret_name }}
                   key: POSTGRES_PASSWORD
+
             - name: KIWI_DB_HOST
               value: {{ .Values.database.host | quote }}
+
             - name: KIWI_DB_PORT
               value: {{ .Values.database.port | quote }}
+
             - name: KIWI_DB_NAME
               value: {{ .Values.database.db_name | quote }}
+
             - name: TCMS_SETTINGS_MODULE
+              value: tcms_settings_dir.postgres_settings
+
+            - name: DJANGO_SETTINGS_MODULE
               value: tcms_settings_dir.postgres_settings
 
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+
           ports:
             - name: http
               containerPort: {{ .Values.service.port.http }}
               protocol: TCP
+
             - name: https
               containerPort: {{ .Values.service.port.https }}
               protocol: TCP
+
           livenessProbe:
             httpGet:
               path: /accounts/login/
               port: http
+
           readinessProbe:
             httpGet:
               path: /accounts/login/
               port: http
+
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+
           env:
             - name: SECRET_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ $secret_name }}
                   key: secret_key
+
             - name: KIWI_DB_USER
               valueFrom:
                 secretKeyRef:
                   name: {{ $secret_name }}
                   key: POSTGRES_USER
+
             - name: KIWI_DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ $secret_name }}
                   key: POSTGRES_PASSWORD
+
             - name: KIWI_DB_HOST
               value: {{ .Values.database.host | quote }}
+
             - name: KIWI_DB_PORT
               value: {{ .Values.database.port | quote }}
+
             - name: KIWI_DB_NAME
               value: {{ .Values.database.db_name | quote }}
+
             - name: TCMS_SETTINGS_MODULE
               value: tcms_settings_dir.postgres_settings
+
+            - name: DJANGO_SETTINGS_MODULE
+              value: tcms_settings_dir.postgres_settings
+
             - name: SERVER_EMAIL
               value: {{ .Values.email.from | quote }}
+
             - name: EMAIL_SUBJECT_PREFIX
               value: {{ .Values.email.subject | quote }}
+
             - name: MEDIA_ROOT
               value: {{ .Values.media.root | quote }}
+
             - name: MEDIA_URL
               value: {{ .Values.media.url | quote }}
 
