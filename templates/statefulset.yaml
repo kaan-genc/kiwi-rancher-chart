@@ -1,168 +1,42 @@
-{{- $secret_name := .Values.database.existingSecret | default (include "kiwi.credentials" .) -}}
-
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: {{ include "kiwi.fullname" . }}
-  labels:
-    {{- include "kiwi.labels" . | nindent 4 }}
-spec:
-  selector:
-    matchLabels:
-      {{- include "kiwi.selectorLabels" . | nindent 6 }}
-  template:
-    metadata:
-      {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      labels:
-        {{- include "kiwi.selectorLabels" . | nindent 8 }}
-    spec:
-      securityContext:
-        fsGroup: 1001
-
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-
-      volumes:
-        - name: media
-          {{- if .Values.storage.persistent }}
-          persistentVolumeClaim:
-            claimName: {{ include "kiwi.fullname" . }}
-          {{- else }}
-          emptyDir: {}
-          {{- end }}
-
-        - name: kiwi-socket
-          emptyDir: {}
-
-        - name: nginx-config
-          configMap:
-            name: {{ include "kiwi.fullname" . }}-nginx
-
-      initContainers:
-        - name: migrations
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["/Kiwi/manage.py", "migrate"]
-          env:
-            - name: SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ $secret_name }}
-                  key: secret_key
-
-            - name: KIWI_DB_ENGINE
-              value: django.db.backends.postgresql
-
-            - name: KIWI_DB_USER
-              valueFrom:
-                secretKeyRef:
-                  name: {{ $secret_name }}
-                  key: POSTGRES_USER
-
-            - name: KIWI_DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ $secret_name }}
-                  key: POSTGRES_PASSWORD
-
-            - name: KIWI_DB_HOST
-              value: {{ .Values.database.host | quote }}
-
-            - name: KIWI_DB_PORT
-              value: {{ .Values.database.port | quote }}
-
-            - name: KIWI_DB_NAME
-              value: {{ .Values.database.db_name | quote }}
-
-      containers:
-        - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-
-          env:
-            - name: SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ $secret_name }}
-                  key: secret_key
-
-            - name: KIWI_DB_ENGINE
-              value: django.db.backends.postgresql
-
-            - name: KIWI_DB_USER
-              valueFrom:
-                secretKeyRef:
-                  name: {{ $secret_name }}
-                  key: POSTGRES_USER
-
-            - name: KIWI_DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ $secret_name }}
-                  key: POSTGRES_PASSWORD
-
-            - name: KIWI_DB_HOST
-              value: {{ .Values.database.host | quote }}
-
-            - name: KIWI_DB_PORT
-              value: {{ .Values.database.port | quote }}
-
-            - name: KIWI_DB_NAME
-              value: {{ .Values.database.db_name | quote }}
-
-            - name: SERVER_EMAIL
-              value: {{ .Values.email.from | quote }}
-
-            - name: EMAIL_SUBJECT_PREFIX
-              value: {{ .Values.email.subject | quote }}
-
-            - name: MEDIA_ROOT
-              value: {{ .Values.media.root | quote }}
-
-            - name: MEDIA_URL
-              value: {{ .Values.media.url | quote }}
-
-          volumeMounts:
-            - name: media
-              mountPath: {{ .Values.media.root | quote }}
-
-            - name: kiwi-socket
-              mountPath: /tmp
-
         - name: nginx
           image: nginx:1.27-alpine
           imagePullPolicy: IfNotPresent
+
+          command:
+            - /bin/sh
+            - -c
+          args:
+            - |
+              echo "Waiting for Kiwi uWSGI socket..."
+              until [ -S /tmp/kiwitcms.sock ]; do
+                sleep 2
+              done
+              chmod 777 /tmp/kiwitcms.sock
+              echo "Socket found and permission fixed. Starting nginx..."
+              exec nginx -g 'daemon off;'
 
           ports:
             - name: http
               containerPort: 80
               protocol: TCP
 
-          livenessProbe:
-            httpGet:
-              path: /accounts/login/
-              port: http
-            initialDelaySeconds: 45
-            periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 6
-
           readinessProbe:
             httpGet:
               path: /accounts/login/
               port: http
-            initialDelaySeconds: 45
+            initialDelaySeconds: 90
             periodSeconds: 10
             timeoutSeconds: 5
-            failureThreshold: 6
+            failureThreshold: 12
+
+          livenessProbe:
+            httpGet:
+              path: /accounts/login/
+              port: http
+            initialDelaySeconds: 120
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 12
 
           volumeMounts:
             - name: kiwi-socket
