@@ -1,12 +1,15 @@
 image:
   repository: kiwitcms/kiwi
+  tag: latest
   pullPolicy: IfNotPresent
-  
+
+imagePullSecrets: []
+
 service:
   type: ClusterIP
   port:
     http: 80
-    https: 8443
+
 ingress:
   enabled: true
   className: nginx
