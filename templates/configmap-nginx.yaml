@@ -13,7 +13,7 @@ data:
         client_max_body_size 100M;
 
         location / {
-            include /etc/nginx/uwsgi_params;
+            include uwsgi_params;
             uwsgi_pass unix:/tmp/kiwitcms.sock;
             uwsgi_read_timeout 300;
             uwsgi_send_timeout 300;
