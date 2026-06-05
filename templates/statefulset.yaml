@@ -159,18 +159,20 @@ spec:
 
           readinessProbe:
             httpGet:
-              path: /accounts/login/
+              path: /healthz
               port: http
-            initialDelaySeconds: 90
+              scheme: HTTP
+            initialDelaySeconds: 10
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 12
 
           livenessProbe:
             httpGet:
-              path: /accounts/login/
+              path: /healthz
               port: http
-            initialDelaySeconds: 120
+              scheme: HTTP
+            initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 12
