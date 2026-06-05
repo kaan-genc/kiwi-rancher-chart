@@ -1,4 +1,4 @@
-{{- $secret_name := .Values.database.existingSecret | default (include "kiwi.credentials" .) -}}
+{{- $secret_name := .Values.database.existingSecret | default (include "kiwi.credentials" .) }}
 
 apiVersion: apps/v1
 kind: StatefulSet
@@ -22,10 +22,8 @@ spec:
       securityContext:
         fsGroup: 1001
 
-      {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        - name: ghcr-secret
 
       volumes:
         - name: media
@@ -80,7 +78,7 @@ spec:
               value: {{ .Values.database.db_name | quote }}
 
       containers:
-        - name: {{ .Chart.Name }}
+        - name: kiwi
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
 
@@ -141,28 +139,41 @@ spec:
           image: nginx:1.27-alpine
           imagePullPolicy: IfNotPresent
 
+          command:
+            - /bin/sh
+            - -c
+          args:
+            - |
+              echo "Waiting for Kiwi uWSGI socket..."
+              until [ -S /tmp/kiwitcms.sock ]; do
+                sleep 2
+              done
+              chmod 777 /tmp/kiwitcms.sock
+              echo "Socket found and permission fixed. Starting nginx..."
+              exec nginx -g 'daemon off;'
+
           ports:
             - name: http
               containerPort: 80
               protocol: TCP
 
-          livenessProbe:
-            httpGet:
-              path: /accounts/login/
-              port: http
-            initialDelaySeconds: 45
-            periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 6
-
           readinessProbe:
             httpGet:
               path: /accounts/login/
               port: http
-            initialDelaySeconds: 45
+            initialDelaySeconds: 90
             periodSeconds: 10
             timeoutSeconds: 5
-            failureThreshold: 6
+            failureThreshold: 12
+
+          livenessProbe:
+            httpGet:
+              path: /accounts/login/
+              port: http
+            initialDelaySeconds: 120
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 12
 
           volumeMounts:
             - name: kiwi-socket
