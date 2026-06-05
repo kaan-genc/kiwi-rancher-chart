@@ -18,6 +18,16 @@ data:
             add_header Content-Type text/plain;
         }
 
+        location /static/ {
+            alias /Kiwi/static/;
+            expires 30d;
+            access_log off;
+        }
+
+        location /uploads/ {
+            alias /Kiwi/uploads/;
+        }
+
         location / {
             include uwsgi_params;
 
@@ -30,9 +40,5 @@ data:
             uwsgi_pass unix:/tmp/kiwitcms.sock;
             uwsgi_read_timeout 300;
             uwsgi_send_timeout 300;
-        }
-
-        location /uploads/ {
-            alias /Kiwi/uploads/;
         }
     }
