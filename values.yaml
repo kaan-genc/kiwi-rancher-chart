@@ -1,17 +1,16 @@
 image:
   repository: kiwitcms/kiwi
-  tag: latest
   pullPolicy: IfNotPresent
-
-imagePullSecrets: []
+  tag: latest
 
 service:
   type: ClusterIP
   port:
     http: 80
+    https: 443
 
 ingress:
-  enabled: true
+  enabled: false
   className: nginx
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
