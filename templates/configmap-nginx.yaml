@@ -20,6 +20,13 @@ data:
 
         location / {
             include uwsgi_params;
+
+            uwsgi_param HTTP_X_FORWARDED_PROTO https;
+            uwsgi_param HTTP_X_FORWARDED_SSL on;
+            uwsgi_param HTTPS on;
+            uwsgi_param SERVER_PORT 443;
+            uwsgi_param HTTP_HOST $host;
+
             uwsgi_pass unix:/tmp/kiwitcms.sock;
             uwsgi_read_timeout 300;
             uwsgi_send_timeout 300;
