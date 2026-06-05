@@ -37,6 +37,9 @@ spec:
         - name: kiwi-socket
           emptyDir: {}
 
+        - name: kiwi-static
+          emptyDir: {}
+
         - name: nginx-config
           configMap:
             name: {{ include "kiwi.fullname" . }}-nginx
@@ -76,6 +79,23 @@ spec:
 
             - name: KIWI_DB_NAME
               value: {{ .Values.database.db_name | quote }}
+
+        - name: copy-static
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /bin/sh
+            - -c
+          args:
+            - |
+              echo "Copying Kiwi static files..."
+              mkdir -p /shared-static
+              cp -a /Kiwi/static/. /shared-static/
+              echo "Static files copied"
+              ls -lah /shared-static | head
+          volumeMounts:
+            - name: kiwi-static
+              mountPath: /shared-static
 
       containers:
         - name: kiwi
@@ -180,6 +200,9 @@ spec:
           volumeMounts:
             - name: kiwi-socket
               mountPath: /tmp
+
+            - name: kiwi-static
+              mountPath: /Kiwi/static
 
             - name: media
               mountPath: {{ .Values.media.root | quote }}
