@@ -1,15 +1,14 @@
 image:
   repository: kiwitcms/kiwi
   pullPolicy: IfNotPresent
-
+  
 service:
   type: ClusterIP
   port:
     http: 80
     https: 8443
-
 ingress:
-  enabled: false
+  enabled: true
   className: nginx
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
