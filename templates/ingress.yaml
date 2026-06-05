@@ -1,9 +1,9 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "kiwi.fullname" . -}}
-{{- $svcPort := .Values.service.port.https -}}
+{{- $svcPort := .Values.service.port.http -}}
 {{- if and .Values.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
-  {{- $_ := set .Values.ingress.annotations "kubernetes.io/ingress.class" .Values.ingress.className}}
+  {{- $_ := set .Values.ingress.annotations "kubernetes.io/ingress.class" .Values.ingress.className }}
   {{- end }}
 {{- end }}
 apiVersion: networking.k8s.io/v1
@@ -23,7 +23,7 @@ spec:
   {{- if .Values.ingress.tls.enabled }}
   tls:
     - hosts:
-        - {{ .Values.ingress.host }}
+        - {{ .Values.ingress.host | quote }}
       secretName: {{ $fullName }}-tls
   {{- end }}
   rules:
@@ -34,7 +34,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ $fullName }}-https
+                name: {{ $fullName }}-http
                 port:
                   number: {{ $svcPort }}
 {{- end }}
