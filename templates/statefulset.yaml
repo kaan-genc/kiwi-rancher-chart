@@ -90,9 +90,9 @@ spec:
             - |
               echo "Copying Kiwi static files..."
               mkdir -p /shared-static
-              cp -a /Kiwi/static/. /shared-static/
+              cp -aL /Kiwi/static/. /shared-static/
               echo "Static files copied"
-              ls -lah /shared-static | head
+              find /shared-static -maxdepth 4 -type f | head -50
           volumeMounts:
             - name: kiwi-static
               mountPath: /shared-static
